@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz das Equipes 💡</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      background: #111;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #00aaff;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: scale(0.9);}
+      to {opacity: 1; transform: scale(1);}
+    }
+
+    h1 {
+      color: #00aaff;
+      margin-bottom: 20px;
+    }
+
+    button {
+      background: #00aaff;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+      margin-top: 10px;
+      font-size: 1rem;
+    }
+
+    button:hover {
+      background: #0088cc;
+      transform: scale(1.05);
+    }
+
+    textarea {
+      width: 100%;
+      height: 80px;
+      margin-top: 10px;
+      border-radius: 8px;
+      padding: 10px;
+      border: none;
+      resize: none;
+      font-size: 14px;
+      background: #222;
+      color: #fff;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .botoes {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 15px;
+    }
+
+    .opcao {
+      width: 40%;
+    }
+
+    #feedback {
+      margin-top: 10px;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    #feedback.correct {
+      color: #16e016;
+      animation: pulse 0.4s ease;
+    }
+
+    #feedback.wrong {
+      color: #ff4444;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Quiz das Equipes 💡</h1>
+    <div id="quiz-container">
+      <button id="sortearBtn">🎲 Sortear Equipe</button>
+
+      <div id="pergunta-aberta" class="hidden">
+        <h2 id="equipeNome"></h2>
+        <p id="perguntaTexto"></p>
+        <textarea id="respostaAberta" placeholder="Digite sua resposta aqui..."></textarea>
+        <button id="irFechadasBtn">Ir para questões fechadas ➡️</button>
+      </div>
+
+      <div id="questoes-fechadas" class="hidden">
+        <h3>Questão fechada</h3>
+        <p id="questaoFechadaTexto"></p>
+        <div class="botoes">
+          <button class="opcao" data-resposta="certa">Certa ✅</button>
+          <button class="opcao" data-resposta="errada">Errada ❌</button>
+        </div>
+        <p id="feedback"></p>
+        <button id="novoSorteio">🔁 Sortear outra equipe</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const equipes = [
+      { 
+        nome: "Equipe Emillin", 
+        perguntaAberta: "👉 Quais são as principais características do sistema de arquivos NTFS?", 
+        questaoFechada: "O NTFS é usado principalmente no Windows.", 
+        correta: "certa" 
+      },
+      { 
+        nome: "Equipe Ana Livia", 
+        perguntaAberta: "👉 Quais são as vantagens do sistema de arquivos EXT4?", 
+        questaoFechada: "O EXT4 é usado principalmente em sistemas Linux.", 
+        correta: "certa" 
+      },
+      { 
+        nome: "Equipe Aila", 
+        perguntaAberta: "👉 Como as informações são gravadas em um SSD?", 
+        questaoFechada: "O SSD utiliza discos magnéticos para armazenar dados.", 
+        correta: "errada" 
+      },
+      { 
+        nome: "Equipe Danilo", 
+        perguntaAberta: "👉 Como as informações são gravadas em um HD?", 
+        questaoFechada: "O HD grava dados em discos magnéticos giratórios.", 
+        correta: "certa" 
+      }
+    ];
+
+    const sortearBtn = document.getElementById("sortearBtn");
+    const perguntaAbertaDiv = document.getElementById("pergunta-aberta");
+    const questoesFechadasDiv = document.getElementById("questoes-fechadas");
+    const equipeNome = document.getElementById("equipeNome");
+    const perguntaTexto = document.getElementById("perguntaTexto");
+    const questaoFechadaTexto = document.getElementById("questaoFechadaTexto");
+    const irFechadasBtn = document.getElementById("irFechadasBtn");
+    const botoesOpcoes = document.querySelectorAll(".opcao");
+    const feedback = document.getElementById("feedback");
+    const novoSorteio = document.getElementById("novoSorteio");
+
+    let equipeAtual = null;
+    let usadas = [];
+
+    sortearBtn.addEventListener("click", () => {
+      if (usadas.length === equipes.length) usadas = [];
+      let sorteada;
+      do {
+        sorteada = equipes[Math.floor(Math.random() * equipes.length)];
+      } while (usadas.includes(sorteada.nome));
+
+      usadas.push(sorteada.nome);
+      equipeAtual = sorteada;
+
+      equipeNome.textContent = sorteada.nome;
+      perguntaTexto.textContent = sorteada.perguntaAberta;
+
+      sortearBtn.classList.add("hidden");
+      perguntaAbertaDiv.classList.remove("hidden");
+    });
+
+    irFechadasBtn.addEventListener("click", () => {
+      perguntaAbertaDiv.classList.add("hidden");
+      questoesFechadasDiv.classList.remove("hidden");
+
+      questaoFechadaTexto.textContent = equipeAtual.questaoFechada;
+      feedback.textContent = "";
+      feedback.className = "";
+    });
+
+    botoesOpcoes.forEach((botao) => {
+      botao.addEventListener("click", () => {
+        if (botao.dataset.resposta === equipeAtual.correta) {
+          feedback.textContent = "✅ Resposta correta!";
+          feedback.className = "correct";
+        } else {
+          feedback.textContent = "❌ Resposta incorreta!";
+          feedback.className = "wrong";
+        }
+      });
+    });
+
+    novoSorteio.addEventListener("click", () => {
+      questoesFechadasDiv.classList.add("hidden");
+      sortearBtn.classList.remove("hidden");
+    });
+  </script>
+</body>
+</html>
