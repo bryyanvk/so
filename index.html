@@ -2,224 +2,248 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Quiz das Equipes 💡</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quiz das Equipes</title>
   <style>
+    :root {
+      --bg: #f5f5f5;
+      --text: #222;
+      --card: #fff;
+      --shadow: rgba(0,0,0,0.2);
+      --primary: #3b82f6;
+      --correct: #16a34a;
+      --wrong: #dc2626;
+    }
+
+    [data-theme="dark"] {
+      --bg: #121212;
+      --text: #f5f5f5;
+      --card: #1e1e1e;
+      --shadow: rgba(0,0,0,0.7);
+      --primary: #60a5fa;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #0a0a0a;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
       margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
     }
 
     .container {
-      background: #111;
-      padding: 30px;
-      border-radius: 15px;
-      box-shadow: 0 0 20px #00aaff;
+      background: var(--card);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px var(--shadow);
       width: 90%;
-      max-width: 500px;
+      max-width: 700px;
       text-align: center;
-      animation: fadeIn 0.6s ease;
-    }
-
-    @keyframes fadeIn {
-      from {opacity: 0; transform: scale(0.9);}
-      to {opacity: 1; transform: scale(1);}
+      transition: all 0.3s ease;
     }
 
     h1 {
-      color: #00aaff;
-      margin-bottom: 20px;
+      margin-bottom: 1.5rem;
     }
 
     button {
-      background: #00aaff;
+      background: var(--primary);
       border: none;
+      padding: 12px 20px;
+      border-radius: 10px;
       color: #fff;
-      padding: 10px 20px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-      margin-top: 10px;
       font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 5px 10px var(--shadow);
+      transition: transform 0.2s ease, background 0.3s ease;
     }
 
     button:hover {
-      background: #0088cc;
       transform: scale(1.05);
     }
 
-    textarea {
-      width: 100%;
-      height: 80px;
-      margin-top: 10px;
-      border-radius: 8px;
+    .question-box {
+      margin: 1.5rem 0;
+      padding: 1.5rem;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.05);
+      text-align: left;
+    }
+
+    input {
+      width: 90%;
       padding: 10px;
-      border: none;
-      resize: none;
-      font-size: 14px;
-      background: #222;
-      color: #fff;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 1rem;
     }
 
-    .hidden {
-      display: none;
-    }
-
-    .botoes {
-      display: flex;
-      justify-content: space-around;
-      margin-top: 15px;
-    }
-
-    .opcao {
-      width: 40%;
-    }
-
-    #feedback {
-      margin-top: 10px;
+    .feedback {
+      margin-top: 1rem;
       font-weight: bold;
-      transition: 0.3s;
+      font-size: 1.1rem;
     }
 
-    #feedback.correct {
-      color: #16e016;
-      animation: pulse 0.4s ease;
+    .correct {
+      color: var(--correct);
     }
 
-    #feedback.wrong {
-      color: #ff4444;
-      animation: shake 0.4s ease;
+    .wrong {
+      color: var(--wrong);
     }
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
+    .theme-toggle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: var(--card);
+      border: none;
+      padding: 10px 15px;
+      border-radius: 50px;
+      box-shadow: 0 5px 10px var(--shadow);
+      cursor: pointer;
+      font-weight: bold;
     }
 
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
+    .results {
+      margin-top: 2rem;
+      text-align: left;
+      font-size: 1rem;
     }
   </style>
 </head>
-<body>
+<body data-theme="light">
+  <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
   <div class="container">
-    <h1>Quiz das Equipes 💡</h1>
-    <div id="quiz-container">
-      <button id="sortearBtn">🎲 Sortear Equipe</button>
+    <h1>Quiz das Equipes</h1>
+    <button onclick="sortearEquipe()">Sortear Equipe</button>
 
-      <div id="pergunta-aberta" class="hidden">
-        <h2 id="equipeNome"></h2>
-        <p id="perguntaTexto"></p>
-        <textarea id="respostaAberta" placeholder="Digite sua resposta aqui..."></textarea>
-        <button id="irFechadasBtn">Ir para questões fechadas ➡️</button>
-      </div>
-
-      <div id="questoes-fechadas" class="hidden">
-        <h3>Questão fechada</h3>
-        <p id="questaoFechadaTexto"></p>
-        <div class="botoes">
-          <button class="opcao" data-resposta="certa">Certa ✅</button>
-          <button class="opcao" data-resposta="errada">Errada ❌</button>
-        </div>
-        <p id="feedback"></p>
-        <button id="novoSorteio">🔁 Sortear outra equipe</button>
-      </div>
+    <div class="question-box" id="question-box" style="display:none;">
+      <h2 id="team-name"></h2>
+      <p id="question"></p>
+      <input type="text" id="answer" placeholder="Digite sua resposta...">
+      <button onclick="validarResposta()">Enviar Resposta</button>
+      <div class="feedback" id="feedback"></div>
     </div>
+
+    <div class="results" id="results"></div>
   </div>
 
   <script>
-    const equipes = [
-      { 
-        nome: "Equipe Emillin", 
-        perguntaAberta: "👉 Quais são as principais características do sistema de arquivos NTFS?", 
-        questaoFechada: "O NTFS é usado principalmente no Windows.", 
-        correta: "certa" 
+    const equipes = {
+      "Equipe Emillin": {
+        pergunta: "👉 Quais são as principais características do sistema de arquivos NTFS e por que ele é considerado mais seguro em comparação ao FAT32?",
+        respostas: ["ntfs", "segurança", "permissões", "journaling"],
+        explicacao: "O NTFS é mais seguro por oferecer criptografia, permissões de acesso e journaling para evitar perdas."
       },
-      { 
-        nome: "Equipe Ana Livia", 
-        perguntaAberta: "👉 Quais são as vantagens do sistema de arquivos EXT4?", 
-        questaoFechada: "O EXT4 é usado principalmente em sistemas Linux.", 
-        correta: "certa" 
+      "Equipe Ana Livia": {
+        pergunta: "👉 Quais são as vantagens do sistema de arquivos EXT4 em relação ao EXT3 e por que ele é tão usado em distribuições Linux?",
+        respostas: ["ext4", "eficiência", "jornal", "performance"],
+        explicacao: "O EXT4 melhora o desempenho, suporta arquivos maiores e tem menos fragmentação em relação ao EXT3."
       },
-      { 
-        nome: "Equipe Aila", 
-        perguntaAberta: "👉 Como as informações são gravadas em um SSD?", 
-        questaoFechada: "O SSD utiliza discos magnéticos para armazenar dados.", 
-        correta: "errada" 
+      "Equipe Aila": {
+        pergunta: "👉 De que forma os dados são armazenados em células de memória flash dentro de um SSD e como o processo de desgaste influencia sua vida útil?",
+        respostas: ["ssd", "flash", "células", "desgaste"],
+        explicacao: "SSDs usam memória flash NAND e sofrem desgaste com cada ciclo de escrita, o que limita sua vida útil."
       },
-      { 
-        nome: "Equipe Danilo", 
-        perguntaAberta: "👉 Como as informações são gravadas em um HD?", 
-        questaoFechada: "O HD grava dados em discos magnéticos giratórios.", 
-        correta: "certa" 
+      "Equipe Danilo": {
+        pergunta: "👉 Como funciona o processo de gravação de dados em um HD utilizando discos magnéticos e cabeças de leitura/escrita?",
+        respostas: ["hd", "disco", "magnético", "cabeça"],
+        explicacao: "HDs utilizam discos giratórios magnéticos e cabeças que movem-se fisicamente para ler e gravar dados."
       }
-    ];
+    };
 
-    const sortearBtn = document.getElementById("sortearBtn");
-    const perguntaAbertaDiv = document.getElementById("pergunta-aberta");
-    const questoesFechadasDiv = document.getElementById("questoes-fechadas");
-    const equipeNome = document.getElementById("equipeNome");
-    const perguntaTexto = document.getElementById("perguntaTexto");
-    const questaoFechadaTexto = document.getElementById("questaoFechadaTexto");
-    const irFechadasBtn = document.getElementById("irFechadasBtn");
-    const botoesOpcoes = document.querySelectorAll(".opcao");
-    const feedback = document.getElementById("feedback");
-    const novoSorteio = document.getElementById("novoSorteio");
-
+    const pontuacoes = {};
+    const tempos = {};
     let equipeAtual = null;
-    let usadas = [];
+    let tempoInicial = null;
 
-    sortearBtn.addEventListener("click", () => {
-      if (usadas.length === equipes.length) usadas = [];
-      let sorteada;
-      do {
-        sorteada = equipes[Math.floor(Math.random() * equipes.length)];
-      } while (usadas.includes(sorteada.nome));
+    // Lista para evitar repetição
+    let equipesRestantes = Object.keys(equipes);
 
-      usadas.push(sorteada.nome);
-      equipeAtual = sorteada;
+    function sortearEquipe() {
+      if (equipesRestantes.length === 0) {
+        alert("✅ Todas as equipes já foram sorteadas! Reiniciando o sorteio...");
+        equipesRestantes = Object.keys(equipes); // Reinicia a lista
+      }
 
-      equipeNome.textContent = sorteada.nome;
-      perguntaTexto.textContent = sorteada.perguntaAberta;
+      const index = Math.floor(Math.random() * equipesRestantes.length);
+      equipeAtual = equipesRestantes.splice(index, 1)[0]; // remove a equipe sorteada
 
-      sortearBtn.classList.add("hidden");
-      perguntaAbertaDiv.classList.remove("hidden");
-    });
+      document.getElementById("team-name").innerText = equipeAtual;
+      document.getElementById("question").innerText = equipes[equipeAtual].pergunta;
+      document.getElementById("question-box").style.display = "block";
+      document.getElementById("answer").value = "";
+      document.getElementById("feedback").innerText = "";
+      document.getElementById("answer").disabled = false;
 
-    irFechadasBtn.addEventListener("click", () => {
-      perguntaAbertaDiv.classList.add("hidden");
-      questoesFechadasDiv.classList.remove("hidden");
+      tempoInicial = Date.now(); // começa o timer
+    }
 
-      questaoFechadaTexto.textContent = equipeAtual.questaoFechada;
-      feedback.textContent = "";
-      feedback.className = "";
-    });
+    function validarResposta() {
+      const resposta = document.getElementById("answer").value.trim().toLowerCase();
+      const corretas = equipes[equipeAtual].respostas;
+      const explicacao = equipes[equipeAtual].explicacao;
 
-    botoesOpcoes.forEach((botao) => {
-      botao.addEventListener("click", () => {
-        if (botao.dataset.resposta === equipeAtual.correta) {
-          feedback.textContent = "✅ Resposta correta!";
-          feedback.className = "correct";
-        } else {
-          feedback.textContent = "❌ Resposta incorreta!";
-          feedback.className = "wrong";
-        }
-      });
-    });
+      const acertou = corretas.some(palavra => resposta.includes(palavra));
+      const feedback = document.getElementById("feedback");
 
-    novoSorteio.addEventListener("click", () => {
-      questoesFechadasDiv.classList.add("hidden");
-      sortearBtn.classList.remove("hidden");
-    });
+      const tempoFinal = (Date.now() - tempoInicial) / 1000; // em segundos
+
+      if (!tempos[equipeAtual]) tempos[equipeAtual] = [];
+      tempos[equipeAtual].push(tempoFinal);
+
+      if (!pontuacoes[equipeAtual]) pontuacoes[equipeAtual] = 0;
+
+      if (acertou) {
+        pontuacoes[equipeAtual]++;
+        feedback.innerHTML = `✅ Resposta Correta!<br>⏱️ Tempo: ${tempoFinal.toFixed(2)}s<br>💡 Explicação: ${explicacao}`;
+        feedback.className = "feedback correct";
+      } else {
+        feedback.innerHTML = `❌ Resposta Errada!<br>⏱️ Tempo: ${tempoFinal.toFixed(2)}s<br>💡 Explicação: ${explicacao}`;
+        feedback.className = "feedback wrong";
+      }
+
+      document.getElementById("answer").disabled = true;
+
+      mostrarResultados();
+    }
+
+    function mostrarResultados() {
+      let html = "<h3>📊 Resultados parciais:</h3><ul>";
+      for (const equipe in pontuacoes) {
+        const pontos = pontuacoes[equipe];
+        const media = calcularMedia(tempos[equipe]);
+        html += `<li><strong>${equipe}</strong>: ${pontos} ponto(s), média de resposta: ${media.toFixed(2)}s</li>`;
+      }
+      html += "</ul>";
+
+      const ranking = Object.entries(pontuacoes).sort((a, b) => b[1] - a[1]);
+      if (ranking.length > 1) {
+        html += `<p>🥇 Melhor equipe até agora: <strong>${ranking[0][0]}</strong></p>`;
+      }
+
+      document.getElementById("results").innerHTML = html;
+    }
+
+    function calcularMedia(arr) {
+      return arr.reduce((acc, val) => acc + val, 0) / arr.length;
+    }
+
+    function toggleTheme() {
+      const body = document.body;
+      if (body.getAttribute("data-theme") === "light") {
+        body.setAttribute("data-theme", "dark");
+        document.querySelector(".theme-toggle").innerText = "☀️";
+      } else {
+        body.setAttribute("data-theme", "light");
+        document.querySelector(".theme-toggle").innerText = "🌙";
+      }
+    }
   </script>
 </body>
 </html>
